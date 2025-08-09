@@ -165,7 +165,11 @@
 <body>
 
     <div class="container">
-        <h1>Festkasse</h1>
+        <h1>Zeltfest 2025 Preisliste</h1>
+        <div class="day-switcher">
+            <button id="saturday-btn" class="active" onclick="switchDay('saturday')">Samstag</button>
+            <button id="sunday-btn" onclick="switchDay('sunday')">Sonntag</button>
+        </div>
         <div id="menu-content">
             </div>
 
@@ -201,16 +205,63 @@
     <script>
         const menus = {
             saturday: {
-                warmeSpeisen: [
-                    { name: "Grillhendl", price: 8.00 },
-                    { name: "Bratwurst", price: 5.00 },
-                    { name: "Kotelette", price: 6.00 },
-                    { name: "Würstel", price: 3.50 }
+                speisen: [
+                    { name: "Burger", price: 8.00 },
+                    { name: "Veggie Burger", price: 8.50 },
+                    { name: "Burger und Pommes", price: 12.00 },
+                    { name: "Schnitzlsemmel", price: 6.50 },
+                    { name: "Pommes", price: 5.00 },
+                    { name: "Frankfurter", price: 5.00 },
+                    { name: "Cici mit Semmel und Salat", price: 11.50 },
+                    { name: "Cici mit Pommes und Salat", price: 14.00 },
+                    { name: "Kotelett mit Pommes und Salat", price: 13.50 },
+                    { name: "Wiener mit Pommes und Salat", price: 15.00 }
                 ],
-                kalteSpeisen: [
-                    { name: "Leberkäse", price: 4.50 },
-                    { name: "Käsekrainer", price: 5.50 },
-                    { name: "Bosna", price: 5.50 }
+                alkoholfreieGetraenke: [
+                    { name: "Limo 0,33 l", price: 3.00 },
+                    { name: "Limo gespritzt 0,5 l", price: 4.00 },
+                    { name: "Cappy, Apfelsaft 0,25 l", price: 3.00 },
+                    { name: "Eistee 0,25 l", price: 3.00 },
+                    { name: "Cappy, Apfels. gesp. 0,5 l", price: 4.00 },
+                    { name: "Red Bull", price: 4.50 },
+                    { name: "Mineral 0,3 l", price: 2.50 },
+                    { name: "Mineral 0,5 l", price: 3.00 },
+                    { name: "Bier alkoholfrei 0,5 l", price: 4.50 }
+                ],
+                alkoholischeGetraenke: [
+                    { name: "Bier/ Radler 0,5", price: 4.50 },
+                    { name: "Bier/ Radler 0,3", price: 3.50 },
+                    { name: "Spritzer/Mischung 0,5 l", price: 5.00 },
+                    { name: "Spritzer/Mischung 0,25 l", price: 3.50 },
+                    { name: "Aperol Spritzer 0,25 l", price: 4.50 },
+                    { name: "Bacardi-Cola", price: 4.50 },
+                    { name: "Wodka Orange", price: 4.50 },
+                    { name: "Wodka Bull", price: 5.00 },
+                    { name: "Flying Hirsch", price: 5.00 },
+                    { name: "Fanta Hunter", price: 4.50 },
+                    { name: "Almi weiß, Cola rot 0,25 l", price: 3.50 },
+                    { name: "Whisky- Cola/Bull", price: 5.00 },
+                    { name: "Gin Tonic", price: 4.50 },
+                    { name: "Eristoff Ice", price: 4.50 },
+                    { name: "Jägermeister", price: 3.00 },
+                    { name: "Berliner Luft", price: 3.00 },
+                    { name: "Klopfer", price: 3.00 }
+                ]
+            },
+            sunday: {
+                speisen: [
+                    { name: "Cici mit Semmel und Salat", price: 11.50 },
+                    { name: "Cici mit Pommes und Salat", price: 14.00 },
+                    { name: "Kotelett mit Pommes und Salat", price: 13.50 },
+                    { name: "Wiener mit Pommes und Salat", price: 15.00 },
+                    { name: "Putensteak mit Pommes und Salat", price: 15.00 },
+                    { name: "Grillteller mit Pommes und Salat", price: 14.50 },
+                    { name: "Kotelett mit Semmel", price: 12.50 },
+                    { name: "Schnitzlsemmel", price: 6.50 },
+                    { name: "Pommes", price: 5.00 },
+                    { name: "Semmel", price: 0.50 },
+                    { name: "Frankfurter mit Semmel", price: 5.00 },
+                    { name: "Kasnudel mit Salat", price: 12.50 }
                 ],
                 alkoholfreieGetraenke: [
                     { name: "Limo 0,33 l", price: 3.00 },
@@ -252,10 +303,19 @@
         const paidAmountInput = document.getElementById('paid-amount');
         const changeAmountSpan = document.getElementById('change-amount');
         const orderSummaryDiv = document.getElementById('order-summary');
+        const saturdayBtn = document.getElementById('saturday-btn');
+        const sundayBtn = document.getElementById('sunday-btn');
         
+        function switchDay(day) {
+            currentDay = day;
+            saturdayBtn.classList.remove('active');
+            sundayBtn.classList.remove('active');
+            document.getElementById(day + '-btn').classList.add('active');
+            resetApp();
+        }
+
         function renderMenu() {
             menuContent.innerHTML = '';
-            
             const currentMenu = menus[currentDay];
             
             for (const category in currentMenu) {
@@ -263,8 +323,7 @@
                 categoryDiv.className = 'category';
                 const categoryTitle = document.createElement('h3');
                 let titleText = '';
-                if (category === 'warmeSpeisen') titleText = 'Warme Speisen';
-                else if (category === 'kalteSpeisen') titleText = 'Kalte Speisen';
+                if (category === 'speisen') titleText = 'Speisen';
                 else if (category === 'alkoholfreieGetraenke') titleText = 'Alkoholfreie Getränke';
                 else if (category === 'alkoholischeGetraenke') titleText = 'Alkoholische Getränke';
                 categoryTitle.textContent = titleText;
@@ -324,10 +383,12 @@
             let total = 0;
             orderSummaryDiv.innerHTML = '';
             const allItems = [
-                ...menus.saturday.warmeSpeisen,
-                ...menus.saturday.kalteSpeisen,
+                ...menus.saturday.speisen,
                 ...menus.saturday.alkoholfreieGetraenke,
-                ...menus.saturday.alkoholischeGetraenke
+                ...menus.saturday.alkoholischeGetraenke,
+                ...menus.sunday.speisen,
+                ...menus.sunday.alkoholfreieGetraenke,
+                ...menus.sunday.alkoholischeGetraenke
             ];
             for (const name in order) {
                 const quantity = order[name];
