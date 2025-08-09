@@ -111,6 +111,20 @@
             border-radius: 5px;
             border: 1px solid #ccc;
         }
+        .payment-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+        .payment-buttons button {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
         .change {
             font-size: 1.2em;
             font-weight: bold;
@@ -132,6 +146,20 @@
         .reset-button:hover {
             background-color: #c82333;
         }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .order-item-controls button {
+            background-color: #ccc;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -150,6 +178,16 @@
 
             <div class="payment">
                 <label for="paid-amount">Gegebener Betrag (€):</label>
+                <div class="payment-buttons">
+                    <button onclick="addPaidAmount(5)">5 €</button>
+                    <button onclick="addPaidAmount(10)">10 €</button>
+                    <button onclick="addPaidAmount(20)">20 €</button>
+                    <button onclick="addPaidAmount(50)">50 €</button>
+                    <button onclick="addPaidAmount(100)">100 €</button>
+                    <button onclick="addPaidAmount(0.5)">0,50 €</button>
+                    <button onclick="addPaidAmount(1)">1 €</button>
+                    <button onclick="addPaidAmount(2)">2 €</button>
+                </div>
                 <input type="number" id="paid-amount" placeholder="Z.B. 30.00" step="0.01">
                 <div class="change">
                     Rückgeld: <span id="change-amount">0.00</span> €
@@ -163,6 +201,17 @@
     <script>
         const menus = {
             saturday: {
+                warmeSpeisen: [
+                    { name: "Grillhendl", price: 8.00 },
+                    { name: "Bratwurst", price: 5.00 },
+                    { name: "Kotelette", price: 6.00 },
+                    { name: "Würstel", price: 3.50 }
+                ],
+                kalteSpeisen: [
+                    { name: "Leberkäse", price: 4.50 },
+                    { name: "Käsekrainer", price: 5.50 },
+                    { name: "Bosna", price: 5.50 }
+                ],
                 alkoholfreieGetraenke: [
                     { name: "Limo 0,33 l", price: 3.00 },
                     { name: "Limo gespritzt 0,5 l", price: 4.00 },
@@ -171,31 +220,32 @@
                     { name: "Cappy, Apfels. gesp. 0,5 l", price: 4.00 },
                     { name: "Red Bull", price: 4.50 },
                     { name: "Mineral 0,3 l", price: 2.50 },
+                    { name: "Mineral 0,5 l", price: 3.00 },
                     { name: "Bier alkoholfrei 0,5 l", price: 4.50 }
                 ],
                 alkoholischeGetraenke: [
+                    { name: "Bier/ Radler 0,5", price: 4.50 },
+                    { name: "Bier/ Radler 0,3", price: 3.50 },
+                    { name: "Spritzer/Mischung 0,5 l", price: 5.00 },
+                    { name: "Spritzer/Mischung 0,25 l", price: 3.50 },
                     { name: "Aperol Spritzer 0,25 l", price: 4.50 },
                     { name: "Bacardi-Cola", price: 4.50 },
-                    { name: "Flying Hirsch", price: 5.00 },
-                    { name: "Fanta Hunter", price: 4.50 },
-                    { name: "Spritzer/Mischung 0,25 g", price: 3.50 },
-                    { name: "Spritzer/Mischung 0,5 g", price: 5.00 },
-                    { name: "Almi weiß, Cola rot 0,25 g", price: 3.50 },
-                    { name: "Whisky- Cola/Bull", price: 5.00 },
                     { name: "Wodka Orange", price: 4.50 },
                     { name: "Wodka Bull", price: 5.00 },
+                    { name: "Flying Hirsch", price: 5.00 },
+                    { name: "Fanta Hunter", price: 4.50 },
+                    { name: "Almi weiß, Cola rot 0,25 l", price: 3.50 },
+                    { name: "Whisky- Cola/Bull", price: 5.00 },
                     { name: "Gin Tonic", price: 4.50 },
                     { name: "Eristoff Ice", price: 4.50 },
                     { name: "Jägermeister", price: 3.00 },
                     { name: "Berliner Luft", price: 3.00 },
-                    { name: "Klopfer", price: 3.00 },
-                    { name: "Bier/ Radler 0,5", price: 4.50 },
-                    { name: "Bier/ Radler 0,3", price: 3.50 }
+                    { name: "Klopfer", price: 3.00 }
                 ]
             }
         };
 
-        let currentDay = 'saturday'; // Da es nur noch einen Tag gibt, ist dies der Standard
+        let currentDay = 'saturday'; 
         let order = {};
         const menuContent = document.getElementById('menu-content');
         const totalPriceSpan = document.getElementById('total-price');
@@ -213,7 +263,9 @@
                 categoryDiv.className = 'category';
                 const categoryTitle = document.createElement('h3');
                 let titleText = '';
-                if (category === 'alkoholfreieGetraenke') titleText = 'Alkoholfreie Getränke';
+                if (category === 'warmeSpeisen') titleText = 'Warme Speisen';
+                else if (category === 'kalteSpeisen') titleText = 'Kalte Speisen';
+                else if (category === 'alkoholfreieGetraenke') titleText = 'Alkoholfreie Getränke';
                 else if (category === 'alkoholischeGetraenke') titleText = 'Alkoholische Getränke';
                 categoryTitle.textContent = titleText;
                 categoryDiv.appendChild(categoryTitle);
@@ -250,22 +302,49 @@
             return itemDiv;
         }
 
+        function addPaidAmount(amount) {
+            let currentAmount = parseFloat(paidAmountInput.value) || 0;
+            paidAmountInput.value = (currentAmount + amount).toFixed(2);
+            calculateChange();
+        }
+
+        function addOrderItem(name) {
+            order[name] = (order[name] || 0) + 1;
+            updateDisplay();
+        }
+        
+        function removeOrderItem(name) {
+            if (order[name] && order[name] > 0) {
+                order[name]--;
+                updateDisplay();
+            }
+        }
+
         function updateDisplay() {
             let total = 0;
             orderSummaryDiv.innerHTML = '';
+            const allItems = [
+                ...menus.saturday.warmeSpeisen,
+                ...menus.saturday.kalteSpeisen,
+                ...menus.saturday.alkoholfreieGetraenke,
+                ...menus.saturday.alkoholischeGetraenke
+            ];
             for (const name in order) {
                 const quantity = order[name];
                 if (quantity > 0) {
-                    const allItems = [
-                        ...menus.saturday.alkoholfreieGetraenke,
-                        ...menus.saturday.alkoholischeGetraenke
-                    ];
                     const item = allItems.find(i => i.name === name);
                     if (item) {
                         const itemTotal = quantity * item.price;
                         total += itemTotal;
                         const summaryItem = document.createElement('div');
-                        summaryItem.textContent = `${quantity}x ${name} - ${itemTotal.toFixed(2)} €`;
+                        summaryItem.className = 'order-item';
+                        summaryItem.innerHTML = `
+                            <span>${quantity}x ${name} - ${itemTotal.toFixed(2)} €</span>
+                            <div class="order-item-controls">
+                                <button onclick="addOrderItem('${name}')">+</button>
+                                <button onclick="removeOrderItem('${name}')">-</button>
+                            </div>
+                        `;
                         orderSummaryDiv.appendChild(summaryItem);
                     }
                 }
